@@ -69,6 +69,9 @@ type SendMailParams struct {
 	// Dynamic template
 	TemplateID string
 	Data       map[string]interface{}
+
+	AsmGroupID         int
+	AsmGroupsToDisplay []int
 }
 
 func (mailer *Mailer) SendMail(params SendMailParams) error {
@@ -84,6 +87,13 @@ func (mailer *Mailer) SendMail(params SendMailParams) error {
 	var m = mail.NewV3Mail()
 	var e = mail.NewEmail(nameAlias, addressAlias)
 	m.SetFrom(e)
+
+	if params.AsmGroupID > 0 && len(params.AsmGroupsToDisplay) > 0 {
+		m.SetASM(&mail.Asm{
+			GroupID:         params.AsmGroupID,
+			GroupsToDisplay: params.AsmGroupsToDisplay,
+		})
+	}
 
 	p := mail.NewPersonalization()
 	tos := []*mail.Email{
