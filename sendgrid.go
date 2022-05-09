@@ -2,8 +2,6 @@ package sendgrid
 
 import (
 	"encoding/json"
-	"log"
-	"os"
 	"strings"
 
 	"github.com/sendgrid/sendgrid-go"
@@ -11,7 +9,9 @@ import (
 )
 
 type Logger interface {
-	Printf(format string, v ...interface{})
+	Errorf(format string, v ...interface{})
+	Warnf(format string, v ...interface{})
+	Debugf(format string, v ...interface{})
 }
 
 type Config struct {
@@ -48,7 +48,7 @@ func New(config *Config) *Mailer {
 	}
 	var mailer = &Mailer{
 		config: config,
-		logger: log.New(os.Stdout, "\r\n", 0),
+		logger: createLogger(),
 	}
 
 	if config.Logger != nil {
@@ -146,12 +146,12 @@ func (mailer *Mailer) SendMail(params SendMailParams) error {
 	response, err := sendgrid.API(request)
 
 	if err != nil {
-		mailer.logger.Printf("Send mail error: %v\n", err)
+		mailer.logger.Errorf("Send mail error: %v\n", err)
 		return err
 	}
 
 	if response.StatusCode >= 400 {
-		mailer.logger.Printf("Send mail status_code = %d response = %v\n", response.StatusCode, response.Body)
+		mailer.logger.Errorf("Send mail status_code = %d response = %v\n", response.StatusCode, response.Body)
 		var errs ErrorResponse
 		var err = json.Unmarshal([]byte(response.Body), &errs)
 		if err == nil && len(errs.Errors) > 0 {
