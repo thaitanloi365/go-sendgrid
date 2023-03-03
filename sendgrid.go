@@ -43,8 +43,9 @@ type Mailer struct {
 }
 
 func New(config *Config) *Mailer {
+	var logger = createLogger()
 	if config.APIKey == "" {
-		panic("Sendgrid API Key is required")
+		logger.Errorf("Sendgrid API Key is required")
 	}
 	var mailer = &Mailer{
 		config: config,
