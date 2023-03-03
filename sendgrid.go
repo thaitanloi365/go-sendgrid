@@ -49,7 +49,7 @@ func New(config *Config) *Mailer {
 	}
 	var mailer = &Mailer{
 		config: config,
-		logger: createLogger(),
+		logger: logger,
 	}
 
 	if config.Logger != nil {
